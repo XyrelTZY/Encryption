@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UI Design Encrypt and Decrypt</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #000;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .container {
+      background-color: #111;
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+
+    .tab-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem; /* gap between buttons */
+      margin-bottom: 1.5rem;
+    }
+
+    .tab-buttons button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      background-color: white;
+      color: black;
+      border-radius: 8px;
+      flex: 1;
+      max-width: 150px;
+    }
+
+    .tab-buttons button.active {
+      background-color: gray;
+      color: #000;
+      box-shadow: 0 0 8px #fff;
+    }
+
+    .stepper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 1rem 0 2rem;
+      position: relative;
+    }
+
+    .stepper .line {
+      flex: 1;
+      height: 2px;
+      background-color: #888;
+    }
+
+    .step-indicator {
+      background-color: #555;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      z-index: 1;
+      transition: background-color 0.3s;
+      user-select: none;
+    }
+
+    .step-indicator.active {
+      background-color: #fff;
+      color: #000;
+    }
+
+    .step-indicator.done {
+      background-color: #fff;
+      color: #000;
+    }
+
+    .step-indicator.done::before {
+      content: "✓";
+      font-size: 1.1rem;
+    }
+
+    .step-indicator span {
+      display: inline-block;
+    }
+
+    .step-indicator.done span {
+      display: none;
+    }
+
+    .step {
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .step.active {
+      display: flex;
+    }
+
+    .step .title {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    input[type="file"],
+    input[type="text"] {
+      padding: 0.5rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #222;
+      color: #fff;
+      outline: none;
+      font-size: 1rem;
+    }
+
+    input[type="file"]::-webkit-file-upload-button {
+      background-color: #444;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button.action {
+      padding: 0.75rem;
+      background-color: #fff;
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    button.action:hover {
+      background-color: #ddd;
+    }
+
+    .footer-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+
+    .footer-buttons button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .back-btn {
+      background-color: gray;
+      color: black;
+    }
+
+    .view-btn {
+      background-color: white;
+      color: black;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="tab-buttons">
+      <button class="active" onclick="switchMode('encrypt')" id="encryptTab">Encryption</button>
+      <button onclick="switchMode('decrypt')" id="decryptTab">Decryption</button>
+    </div>
+
+    <!-- Encryption Wizard -->
+    <div id="encryptWizard">
+      <div class="stepper" id="encryptStepper">
+        <div class="step-indicator active" id="encStepIndicator1"><span>1</span></div>
+        <div class="line"></div>
+        <div class="step-indicator" id="encStepIndicator2"><span>2</span></div>
+        <div class="line"></div>
+        <div class="step-indicator" id="encStepIndicator3"><span>3</span></div>
+      </div>
+      <div class="step active" id="encStep1">
+        <div class="title">Choose files to encrypt</div>
+        <input type="file" id="encFileInput" />
+        <button class="action" onclick="nextEncStep(2)">Next</button>
+      </div>
+
+      <div class="step" id="encStep2">
+        <div class="title">Enter recipient's public key</div>
+        <input type="text" placeholder="Public key..." id="encPublicKey" />
+        <button class="action" onclick="nextEncStep(3)">Next</button>
+      </div>
+
+      <div class="step" id="encStep3">
+        <div class="title">Download Encrypted File</div>
+        <button class="action">Download</button>
+      </div>
+
+      <div class="footer-buttons">
+        <button class="back-btn" onclick="resetWizard('encrypt')">Back</button>
+        <button class="view-btn">View Encrypted Files</button>
+      </div>
+    </div>
+
+    <!-- Decryption Wizard -->
+    <div id="decryptWizard" style="display: none;">
+      <div class="stepper" id="decryptStepper">
+        <div class="step-indicator active" id="decStepIndicator1"><span>1</span></div>
+        <div class="line"></div>
+        <div class="step-indicator" id="decStepIndicator2"><span>2</span></div>
+        <div class="line"></div>
+        <div class="step-indicator" id="decStepIndicator3"><span>3</span></div>
+      </div>
+      <div class="step active" id="decStep1">
+        <div class="title">Upload encrypted file</div>
+        <input type="file" id="decFileInput" />
+        <button class="action" onclick="nextDecStep(2)">Next</button>
+      </div>
+
+      <div class="step" id="decStep2">
+        <div class="title">Enter your private key</div>
+        <input type="text" placeholder="Private key..." id="decPrivateKey" />
+        <button class="action" onclick="nextDecStep(3)">Next</button>
+      </div>
+
+      <div class="step" id="decStep3">
+        <div class="title">Download Decrypted File</div>
+        <button class="action">Download</button>
+      </div>
+
+      <div class="footer-buttons">
+        <button class="back-btn" onclick="resetWizard('decrypt')">Back</button>
+        <button class="view-btn">View Decrypted Files</button>
+      </div>
+    </div>
+  </div>
+
+ <script>
+  function switchMode(mode) {
+    const encryptTab = document.getElementById("encryptTab");
+    const decryptTab = document.getElementById("decryptTab");
+    const encryptWizard = document.getElementById("encryptWizard");
+    const decryptWizard = document.getElementById("decryptWizard");
+
+    if (mode === "encrypt") {
+      encryptTab.classList.add("active");
+      decryptTab.classList.remove("active");
+      encryptWizard.style.display = "block";
+      decryptWizard.style.display = "none";
+      resetWizard('decrypt');
+    } else {
+      encryptTab.classList.remove("active");
+      decryptTab.classList.add("active");
+      encryptWizard.style.display = "none";
+      decryptWizard.style.display = "block";
+      resetWizard('encrypt');
+    }
+  }
+
+  // Encryption Wizard Step Navigation
+  function nextEncStep(step) {
+    if (step === 2 && !document.getElementById("encFileInput").files.length) {
+      alert("Please select a file to encrypt.");
+      return;
+    }
+    if (step === 3 && !document.getElementById("encPublicKey").value.trim()) {
+      alert("Please enter the recipient's public key.");
+      return;
+    }
+
+    updateStepper("enc", step);
+    showEncStep(step);
+  }
+
+  function showEncStep(step) {
+    for (let i = 1; i <= 3; i++) {
+      document.getElementById("encStep" + i).classList.remove("active");
+      const indicator = document.getElementById("encStepIndicator" + i);
+      indicator.classList.remove("active", "done");
+      if (i < step) {
+        indicator.classList.add("done");
+      } else if (i === step) {
+        indicator.classList.add("active");
+      }
+    }
+    document.getElementById("encStep" + step).classList.add("active");
+  }
+
+  // Decryption Wizard Step Navigation
+  function nextDecStep(step) {
+    if (step === 2 && !document.getElementById("decFileInput").files.length) {
+      alert("Please upload an encrypted file.");
+      return;
+    }
+    if (step === 3 && !document.getElementById("decPrivateKey").value.trim()) {
+      alert("Please enter your private key.");
+      return;
+    }
+
+    updateStepper("dec", step);
+    showDecStep(step);
+  }
+
+  function showDecStep(step) {
+    for (let i = 1; i <= 3; i++) {
+      document.getElementById("decStep" + i).classList.remove("active");
+      const indicator = document.getElementById("decStepIndicator" + i);
+      indicator.classList.remove("active", "done");
+      if (i < step) {
+        indicator.classList.add("done");
+      } else if (i === step) {
+        indicator.classList.add("active");
+      }
+    }
+    document.getElementById("decStep" + step).classList.add("active");
+  }
+
+  // Update Stepper lines (optional enhancement)
+  function updateStepper(prefix, currentStep) {
+    // This can be expanded if you want to change line colors between steps
+    // For now, handled by classes on step indicators only
+  }
+
+  // Reset wizard to step 1 and clear inputs
+  function resetWizard(mode) {
+    if (mode === "encrypt") {
+      document.getElementById("encFileInput").value = "";
+      document.getElementById("encPublicKey").value = "";
+      showEncStep(1);
+    } else if (mode === "decrypt") {
+      document.getElementById("decFileInput").value = "";
+      document.getElementById("decPrivateKey").value = "";
+      showDecStep(1);
+    }
+  }
+
+  // Placeholder for download encrypted file
+  function downloadEncrypted() {
+    alert("Download encrypted file functionality not implemented yet.");
+  }
+
+  // Placeholder for download decrypted file
+  function downloadDecrypted() {
+    alert("Download decrypted file functionality not implemented yet.");
+  }
+
+  // Placeholder for viewing encrypted files
+  function viewEncrypted() {
+    alert("View encrypted files functionality not implemented yet.");
+  }
+
+  // Placeholder for viewing decrypted files
+  function viewDecrypted() {
+    alert("View decrypted files functionality not implemented yet.");
+  }
+</script>
+</body>
+</html>
