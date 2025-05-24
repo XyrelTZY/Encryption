@@ -29,7 +29,7 @@
     .tab-buttons {
       display: flex;
       justify-content: center;
-      gap: 1rem; /* gap between buttons */
+      gap: 1rem; 
       margin-bottom: 1.5rem;
     }
 
@@ -196,8 +196,7 @@
       <button class="active" onclick="switchMode('encrypt')" id="encryptTab">Encryption</button>
       <button onclick="switchMode('decrypt')" id="decryptTab">Decryption</button>
     </div>
-
-    <!-- Encryption Wizard -->
+    
     <div id="encryptWizard">
       <div class="stepper" id="encryptStepper">
         <div class="step-indicator active" id="encStepIndicator1"><span>1</span></div>
@@ -229,7 +228,6 @@
       </div>
     </div>
 
-    <!-- Decryption Wizard -->
     <div id="decryptWizard" style="display: none;">
       <div class="stepper" id="decryptStepper">
         <div class="step-indicator active" id="decStepIndicator1"><span>1</span></div>
@@ -284,7 +282,6 @@
     }
   }
 
-  // Encryption Wizard Step Navigation
   function nextEncStep(step) {
     if (step === 2 && !document.getElementById("encFileInput").files.length) {
       alert("Please select a file to encrypt.");
@@ -341,14 +338,10 @@
     }
     document.getElementById("decStep" + step).classList.add("active");
   }
-
-  // Update Stepper lines (optional enhancement)
+   
   function updateStepper(prefix, currentStep) {
-    // This can be expanded if you want to change line colors between steps
-    // For now, handled by classes on step indicators only
   }
 
-  // Reset wizard to step 1 and clear inputs
   function resetWizard(mode) {
     if (mode === "encrypt") {
       document.getElementById("encFileInput").value = "";
@@ -361,22 +354,17 @@
     }
   }
 
-  // Placeholder for download encrypted file
   function downloadEncrypted() {
     alert("Download encrypted file functionality not implemented yet.");
-  }
-
-  // Placeholder for download decrypted file
+   }
   function downloadDecrypted() {
     alert("Download decrypted file functionality not implemented yet.");
   }
 
-  // Placeholder for viewing encrypted files
   function viewEncrypted() {
     alert("View encrypted files functionality not implemented yet.");
   }
 
-  // Placeholder for viewing decrypted files
   function viewDecrypted() {
     alert("View decrypted files functionality not implemented yet.");
   }
